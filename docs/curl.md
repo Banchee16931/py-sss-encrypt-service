@@ -1,0 +1,1 @@
+curl -i -X POST -H "Content-Type:application/json; charset=utf-8" http://localhost:8080/api/master-passwords/hello -d '{"password_threshold":3, "user_passwords":{"hi":"1", "bye":"2", "other":"3", "next":"4", "final":"5"}}'
