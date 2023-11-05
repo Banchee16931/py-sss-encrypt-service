@@ -1,15 +1,15 @@
+from typing import override
+from api.handler import Handler
 from utils.http import HTTPException, Method, Request, Status
-from db.handler import handler_with_dbclient
+from db.decorators import with_dtclient
 from http.server import BaseHTTPRequestHandler
 from db.database import Database
 from server.router import _Route, _Router
-from api.create_master_password import create_master_password
 from http.server import HTTPServer
 from socketserver import ThreadingMixIn
 
 class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
     _router: _Router = None
-    _db: Database = None
     
     def do_GET(self):
         self.handle_request(Method.GET)
@@ -28,6 +28,7 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
         self.init_routes(self)
         print("Started Server")
     
+    @override
     def handle_request(self, method: Method):
         try:             
             # getting handler
@@ -69,16 +70,16 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
         content_len = int(content_length)
         return self.rfile.read(content_len)
         
-    def init_routes(self):
-        if self._db == None:
-            self._db = Database()
-        
+    def init_routes(self):      
         self._router = router = _Router()
-        router.add_route(_Route("/api/master-passwords/{id}", 
-            handler_with_dbclient(self._db)(create_master_password)
+        router.add_route(_Route("/api/service/{service_name}/account/{account_id}", 
+            Handler.create_master_password
         ).add_method(Method.POST))
-        router.add_route(_Route("/api/master-passwords/{id}/login", 
-            handler_with_dbclient(self._db)(create_master_password)
+        router.add_route(_Route("/api/service/{service_name}/account/{account_id}/regen", 
+            Handler.regenerate_master_password
+        ).add_method(Method.POST))
+        router.add_route(_Route("/api/service/{service_name}/account/{account_id}/login", 
+            Handler.login
         ).add_method(Method.POST))
         
         print(router)

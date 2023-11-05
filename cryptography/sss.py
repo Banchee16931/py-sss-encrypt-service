@@ -9,17 +9,17 @@ from utils.http import HTTPException, Status
 # Extremely large prime used to ensure proper randomness and stop users getting info from individual shares
 _PRIME = 115792089237316195423570985008687907853269984665640564039457584007913129639747
 
-def _greatest_common_divisor(self, a: int, b: int):
+def _greatest_common_divisor(a: int, b: int):
     """ Calculates the largest integer that is divides both a and b """            
     if b == 0:
         return [1, 0]
     else:
         div_number = int(math.floor(a*1.0/b))
         mod = a % b
-        r = self.greatest_common_divisor(b, mod)
+        r = _greatest_common_divisor(b, mod)
         return [r[1], r[0] - r[1]*div_number]
 
-def _mod_inverse(self, number):
+def _mod_inverse(number):
     """ 
     Calculates the modular inverse of _PRIME and the number.
     

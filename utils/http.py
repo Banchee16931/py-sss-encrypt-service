@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List, Self, Sequence, Tuple
 from typing_extensions import Protocol
 
 Method = Enum('Method', ['GET', 'PUT', 'POST', 'DELETE'])
@@ -59,16 +60,23 @@ class Response:
     def status_code(self) -> int:
         return self.status.value
         
-    def set_header(self, key: str, value: str):
+    def set_header(self, key: str, value: str) -> Self:
         self.headers[key] = value
+        return self
         
-    def set_body(self, content_type: HTTPContentType, body: str):
-        print("setting body: ", content_type.name, body)
-        
+    def set_body(self, content_type: HTTPContentType, body: str) -> Self:       
         self.headers["Content-Type"] = content_type
         self.body = bytes(body, "utf-8")
+        return self
 
 class Handler(Protocol):
     def __call__(self, req: Request) -> Response:
         pass
-        
+
+def get_params(params: dict[str, str], *keys: str) -> Sequence[str]:
+    values: List[str] = []
+    for key in keys:
+        if not key in params.keys():
+            raise HTTPException(Status.InternalServerError, f"misconfigured handler or route: missing {key} in params")
+        values.append(params[key])
+    return tuple(values)

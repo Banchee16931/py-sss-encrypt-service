@@ -14,7 +14,7 @@ def handler(func: Callable):
                         raise HTTPException(Status.BadRequest, 
                             f"invalid Content-Type ({arg.content_type}): must be {HTTPContentType.JSON.value}")
             if found_req == False:
-                raise HTTPException(int(Status.InternalServerError.value), f"handler ({func.__name__}) is mis-configured: missing req param")
+                raise HTTPException(Status.InternalServerError, f"handler ({func.__name__}) is mis-configured: missing req param")
             
             return func(*args, **kwargs)
         except HTTPException as inst:
@@ -44,7 +44,7 @@ def log(func: Callable):
                     req = True
                     req = arg
             if req == None:
-                raise HTTPException(int(Status.InternalServerError.value), f"handler ({func.__name__}) is mis-configured: missing req param")
+                raise HTTPException(Status.InternalServerError, f"handler ({func.__name__}) is mis-configured: missing req param")
             
             print(" entered:", func.__name__)
             resp = func(*args, **kwargs)

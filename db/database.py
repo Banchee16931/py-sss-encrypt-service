@@ -41,11 +41,19 @@ class Database:
             print("ensuring passwords table")
             client._cur.execute("""
             create table if not exists passwords (
-                id text,
+                service_name text,
+                account_id text,
                 user_id text,
                 hashed_password text,
                 encrypted_share text,
-                primary key (id, user_id)
+                primary key (service_name, account_id, user_id)
+            );""")
+            client._cur.execute("""
+            create table if not exists example_service_passwords (
+                service_name text,
+                account_id text,
+                password text,
+                primary key (service_name, account_id)
             );""")
         except Exception as inst:
             raise HTTPException(Status.InternalServerError, f"failed to create database: {str(inst)}")
