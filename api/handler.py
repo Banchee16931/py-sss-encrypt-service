@@ -2,20 +2,21 @@ from api.create_master_password import CreateMasterPasswordRequest, create_maste
 from api.login import LoginRequest, get_master_password
 from api.regenerate_master_password import RegenerateMasterPasswordRequest, regenerate_master_password
 from connectors import Connectors
-from db.client import Client
+from db.client import DBClient
 from db.database import Database
 from db.decorators import with_dtclient
 from db.transaction import transaction
 from utils.http import HTTPContentType, HTTPException, Request, Response, Status, get_params
 import json
-from api.decorators import handler, log
+from api.decorators import JSONHandler, log
 
-class Handler:
+class CreateMasterPasswordHandler:
+    """ Handles create master password requests. """
     @with_dtclient(Database())
-    @handler
+    @JSONHandler
     @transaction
     @log
-    def create_master_password(client: Client, req: Request) -> Response:
+    def __call__(client: DBClient, self, req: Request) -> Response:
         print("decoding parameters")
         service_name, account_id = get_params(req.params, "service_name", "account_id")
         try:
@@ -38,11 +39,13 @@ class Handler:
         resp = Response(Status.Created).set_body(HTTPContentType.JSON, json.dumps({"password":master_password}))
         
         return resp
-    
+
+class LoginHandler:
+    """ Handles login requests. """
     @with_dtclient(Database())
-    @handler
+    @JSONHandler
     @log
-    def login(client: Client, req: Request) -> Response:
+    def __call__(client: DBClient, self, req: Request) -> Response:
         print("decoding parameters")
         service_name, account_id = get_params(req.params, "service_name", "account_id")
         try:
@@ -54,16 +57,26 @@ class Handler:
         
         login_req.validate() 
 
-        master_password = get_master_password(client, service_name, account_id, login_req)
+        try:
+            master_password = get_master_password(client, service_name, account_id, login_req)
+        except HTTPException as inst:
+            if (inst.status == Status.NotFound):
+                raise HTTPException(Status.Unauthorized, inst.message)
+            raise inst
+        except Exception as inst:
+            raise inst
+        
         session_key = Connectors().get_session_token(service_name, account_id, master_password)
         
         resp = Response(Status.OK).set_header("Authorization", f"Bearer {session_key}")
         
         return resp
-    
-    @handler
+
+class RegenerateMasterPasswordHandler:
+    """ Handles regenerate master password requests. """
+    @JSONHandler
     @log
-    def regenerate_master_password(req: Request) -> Response:
+    def __call__(req: Request) -> Response:
         print("decoding parameters")
         service_name, account_id = get_params(req.params, "service_name", "account_id")
         try:

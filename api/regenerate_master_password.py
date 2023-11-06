@@ -2,7 +2,7 @@
 from typing import Any
 from api.login import LoginRequest, get_master_password
 from connectors import Connectors
-from db.client import Client
+from db.client import DBClient
 from api.create_master_password import CreateMasterPasswordRequest, create_master_password
 from db.database import Database
 from db.decorators import with_dtclient
@@ -11,11 +11,13 @@ from utils.http import HTTPException, Status
 
 
 class RegenerateMasterPasswordRequest:
+    """ The data format for the body of a request to the regenerate master password endpoint. """
     def __init__(self, user_passwords: dict[str, str], new: dict[str, Any]) -> None:
         self.user_passwords = user_passwords
         self.new = CreateMasterPasswordRequest(**new)
         
     def validate(self):
+        """ Checks all the values in the class are within their parameters. """
         if (len(self.user_passwords) <= 0):
             raise HTTPException(Status.BadRequest, "amount of user passwords was zero or below")
         
@@ -33,6 +35,7 @@ class RegenerateMasterPasswordRequest:
         
 
 def regenerate_master_password(service_name: str, account_id: str, req: RegenerateMasterPasswordRequest):   
+    """ If the user has authorisation, replaces a master password for a given service account with the new one given in the request. """
     print("user_pass:", req.user_passwords)
     print("new_thres:", req.new.password_threshold)
     print("new_user_pass:", req.new.user_passwords)
@@ -53,7 +56,7 @@ def regenerate_master_password(service_name: str, account_id: str, req: Regenera
     
     @with_dtclient(Database())
     @transaction
-    def replace_passwords(client: Client):
+    def replace_passwords(client: DBClient):
         client.delete_passwords(service_name, account_id)
         
         for password in user_passwords:

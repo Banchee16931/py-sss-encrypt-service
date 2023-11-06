@@ -1,11 +1,17 @@
-from utils.http import Handler, Request, Response
+from utils.http import Request, Response
 from utils.http import HTTPException, HTTPContentType, Status
 import json
 from typing import Callable
 
-def handler(func: Callable):
-    def inner(*args, **kwargs) -> Response:
+class JSONHandler:
+    """ Ensures that the incoming request and outgoing errors are in the correct JSON format. """
+    def __init__(self, function):
+        self.function = function
+    
+    def __call__(self, *args, **kwargs) -> Response:
+        """ This is what wraps around the class """
         try:
+            # get the parameter with the Request type
             found_req = False
             for arg in args:
                 if type(arg) == Request:
@@ -13,10 +19,10 @@ def handler(func: Callable):
                     if arg.content_type.replace(" ", "") != HTTPContentType.JSON.value.replace(" ", ""):
                         raise HTTPException(Status.BadRequest, 
                             f"invalid Content-Type ({arg.content_type}): must be {HTTPContentType.JSON.value}")
-            if found_req == False:
-                raise HTTPException(Status.InternalServerError, f"handler ({func.__name__}) is mis-configured: missing req param")
+            if found_req == False: # Error if this is wrapping something that doesn't have the request data type
+                raise HTTPException(Status.InternalServerError, f"handler ({self.function.__name__}) is mis-configured: missing req param")
             
-            return func(*args, **kwargs)
+            return self.function(*args, **kwargs)
         except HTTPException as inst:
             resp = Response(inst.status)
             resp.set_body(HTTPContentType.JSON, json.dumps({
@@ -33,9 +39,9 @@ def handler(func: Callable):
                 "message":str(inst)
             }))
             return resp
-    return inner
 
 def log(func: Callable):
+    """ Logs when the wrapped function has starts, ends and/or fails """
     def inner(*args, **kwargs) -> Response:
         try:
             req = None

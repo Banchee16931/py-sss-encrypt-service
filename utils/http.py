@@ -5,6 +5,7 @@ from typing_extensions import Protocol
 Method = Enum('Method', ['GET', 'PUT', 'POST', 'DELETE'])
 
 class Status(Enum):
+    """ Used to map the names of different HTTP Status codes to the codes themselves. """
     OK = 200
     Created = 201
     
@@ -18,11 +19,13 @@ class Status(Enum):
     
 
 class HTTPContentType(Enum):
+    """ Used to more simply define htlp """
     HTML = "text/html; charset=utf-8"
     JSON = "application/json; charset=utf-8"
     TEXT = "text/plain; charset=utf-8"
 
 class HTTPException(Exception):
+    """ Used to attach HTTP Statuses to error messages so they are correctly returned. """
     status: Status
     message: str
     
@@ -34,6 +37,7 @@ class HTTPException(Exception):
         return self.status.value
 
 class Request:
+    """ Contains all the data required by a handler to perform a given request. """
     url: str
     params: dict[str, str]
     body: bytes
@@ -48,6 +52,7 @@ class Request:
         self.body = body
         
 class Response:
+    """ Contains all the data that is used to format the response body. """
     status: Status
     body: bytes
     headers: dict[str, str]
@@ -70,10 +75,12 @@ class Response:
         return self
 
 class Handler(Protocol):
+    """ Interface to define how Handlers should be formatted. """
     def __call__(self, req: Request) -> Response:
         pass
 
 def get_params(params: dict[str, str], *keys: str) -> Sequence[str]:
+    """ Takes a list of request params and returns the relevant ones defined by the given keys, maintaining the order they were defined in. """
     values: List[str] = []
     for key in keys:
         if not key in params.keys():

@@ -2,25 +2,29 @@ from server.route import _Route
 from utils.http import HTTPException, Handler, Method, Status
 
 class _Router():
+    """ Matches up incoming requests with their relevant handler. """
+    
     routes: dict[Method, list[_Route]]
         
     def __init__(self):
         self.routes = {}
     
-    def get_handler(self, method: Method, route: list[str]) -> tuple[Handler, dict[str, str]]:      
+    def get_handler(self, method: Method, path: list[str]) -> tuple[Handler, dict[str, str]]:     
+        """ This returns the handler that is mapped to the given path. """ 
         if self.routes.get(method) == None:
             self.routes[method] = []
         
-        # Chain of Responsibility Pattern
+        # loops through each route to see if they are the one that has the correct handler.
         for route_option in self.routes[method]:
             try:
-                return route_option.get_handler(route)
+                return route_option.get_handler(path)
             except Exception:
                 continue
 
         raise HTTPException(Status.NotFound, "no route exists for that path")
                 
     def add_route(self, route: _Route) -> None:
+        """ Adds a route to the self.routes Map """
         for method in route.methods():
             if self.routes.get(method) == None:
                 self.routes[method] = []

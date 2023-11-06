@@ -183,7 +183,7 @@ class _Share:
         return encoded_share
         
 
-class ShamirSecretSharing:
+class _ShamirSecretSharing:
     """
         Allows a secret to be split into multiple parts (called shares) that given a minimum number of these
         shares we can re-assemble the original secret. If less than the minimum is provided then the secret
@@ -213,7 +213,7 @@ class ShamirSecretSharing:
         
         Then knowing a minimum number of input => output pairs for that given polynomial we can
         find out the original problem.
-        """
+    """
     
     @classmethod
     def create(self, minimum: int, share_count: int, secret: str) -> list[str]:
@@ -248,21 +248,24 @@ class ShamirSecretSharing:
         return shares
 
     @classmethod
-    def combine(self, shares: list[str]):
+    def combine(self, shares: list[str]) -> str:
         decoded_shares: list[_Share] = []
 
         for share in shares:
+            # Converting to a _Share allows you to pull specific data from it
             decoded_shares.append(_Share(share))
 
         split_secret = [0] * decoded_shares[0].secret_len()
 
-        for secret_index in range(decoded_shares[0].secret_len()):
-            for share_index, share in enumerate(decoded_shares):
+        for secret_index in range(decoded_shares[0].secret_len()): # Looping the length of the secret.
+            for share_index, share in enumerate(decoded_shares): # Looping through the shares
+                # This is some polynomial math that reconstructs the shares into the secret
                 x, y = share[0]
                 numerator = 1
                 denominator = 1
                 for other_share_index, other_share in enumerate(decoded_shares):
                     if share_index != other_share_index:
+                        
                         other_x = other_share[secret_index][0]
                         numerator = (numerator * (-1*other_x)) % _PRIME
                         denominator = (denominator * (x - other_x)) % _PRIME
