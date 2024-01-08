@@ -1,5 +1,5 @@
 from typing import Dict
-from typing import override
+from typing_extensions import override
 
 from connectors.ServiceConnector import ServiceConnector
 from connectors.example_connector import _ExampleConnector
