@@ -72,7 +72,6 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
                 self.wfile.write(resp.body)    
                         
         except HTTPException as inst:
-            raise inst
             # default handle exceptions via HTML
             self.send_error(inst.status_code(), explain = inst.message)
         except Exception as inst:
