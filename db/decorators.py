@@ -18,7 +18,6 @@ def with_dtclient(db: Database) -> Callable[[Callable], Handler]:#
             else:
                 client._cur.close()
                 conn.close()
-            print("inner")
             return result
         return inner
     return wrapper

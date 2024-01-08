@@ -12,7 +12,6 @@ from api.decorators import JSONHandler, log
 
 class CreateMasterPasswordHandler:
     """ Handles create master password requests. """
-    @with_dtclient(Database())
     @JSONHandler
     @transaction
     @log
@@ -42,7 +41,6 @@ class CreateMasterPasswordHandler:
 
 class LoginHandler:
     """ Handles login requests. """
-    @with_dtclient(Database())
     @JSONHandler
     @log
     def __call__(client: DBClient, self, req: Request) -> Response:
@@ -76,7 +74,7 @@ class RegenerateMasterPasswordHandler:
     """ Handles regenerate master password requests. """
     @JSONHandler
     @log
-    def __call__(req: Request) -> Response:
+    def __call__(client: DBClient, self, req: Request) -> Response:
         print("decoding parameters")
         service_name, account_id = get_params(req.params, "service_name", "account_id")
         try:

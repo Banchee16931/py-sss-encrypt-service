@@ -14,7 +14,7 @@ class Database:
             print("setting up schema")
             conn, client = self.client(self)
             try:
-                self._setup(client)    
+                self.setup(client)    
             except Exception as inst:
                 client._cur.close()
                 conn.close()
@@ -36,7 +36,7 @@ class Database:
             raise HTTPException(Status.InternalServerError, f"failed to create db connection: {inst}")
         
     @transaction
-    def _setup(client: DBClient):
+    def setup(client: DBClient):
         """ Ensures that the database tables as defined in the schema are valid. """
         try:
             print("ensuring passwords table")

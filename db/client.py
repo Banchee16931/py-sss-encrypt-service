@@ -5,7 +5,6 @@ from utils.http import HTTPException, Status
 
 class DBClient:
     """ Contains all the interactions that a handler can perform on the database. """
-    
     _cur: Cursor
     
     def __init__(self, cur: Cursor):

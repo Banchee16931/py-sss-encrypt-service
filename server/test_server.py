@@ -1,7 +1,7 @@
 import types
 from server.server import Server
 from unittest.mock import Mock
-from testing.utils.server import create_valid_server
+from testing.utils.api import create_valid_server
 
 from utils.http import HTTPContentType, HTTPException, Method, Response, Status
 
@@ -50,5 +50,3 @@ def test_call_failed():
     
     # assert
     server_mock.send_error.assert_called_once_with(400, explain="test message")
-    
-    assert False

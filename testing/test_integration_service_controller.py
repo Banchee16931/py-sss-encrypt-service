@@ -2,7 +2,7 @@ from unittest.mock import Mock
 from server.route import _Route
 from server.router import _Router
 from server.server import Server
-from testing.utils.server import create_valid_server
+from testing.utils.api import create_valid_server
 from utils.http import HTTPContentType, Method, Request, Response, Status
 
 

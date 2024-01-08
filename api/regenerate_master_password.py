@@ -34,7 +34,7 @@ class RegenerateMasterPasswordRequest:
         self.new.validate()
         
 
-def regenerate_master_password(service_name: str, account_id: str, req: RegenerateMasterPasswordRequest):   
+def regenerate_master_password(client: DBClient, service_name: str, account_id: str, req: RegenerateMasterPasswordRequest):   
     """ If the user has authorisation, replaces a master password for a given service account with the new one given in the request. """
     print("user_pass:", req.user_passwords)
     print("new_thres:", req.new.password_threshold)
@@ -42,7 +42,7 @@ def regenerate_master_password(service_name: str, account_id: str, req: Regenera
     req.validate()
     
     print("getting old password")
-    old_master_password = with_dtclient(Database())(transaction(get_master_password))(service_name, account_id, LoginRequest(req.user_passwords))
+    old_master_password = with_dtclient(client)(transaction(get_master_password))(service_name, account_id, LoginRequest(req.user_passwords))
     
     print("authenticating old password")
     Connectors().get_session_token(service_name, account_id, old_master_password)
@@ -54,7 +54,7 @@ def regenerate_master_password(service_name: str, account_id: str, req: Regenera
     print("updating old password")
     Connectors().update_account_password(service_name, account_id, old_master_password, new_master_password)
     
-    @with_dtclient(Database())
+    @with_dtclient(client)
     @transaction
     def replace_passwords(client: DBClient):
         client.delete_passwords(service_name, account_id)

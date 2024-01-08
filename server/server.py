@@ -1,5 +1,7 @@
 from typing_extensions import override
 from api.handler import CreateMasterPasswordHandler, LoginHandler, RegenerateMasterPasswordHandler
+from db.database import Database
+from db.decorators import with_dtclient
 from utils.http import HTTPException, Method, Request, Status
 from http.server import BaseHTTPRequestHandler
 from server.router import _Route, _Router
@@ -9,7 +11,8 @@ from socketserver import ThreadingMixIn
 class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
     """This received HTTP requests and routes them to the correct method on the router."""
 
-    _router: _Router = None 
+    router: _Router = None 
+    database: Database = Database()
     
     def do_GET(self):
         """ The function that is called during a GET HTTP request. """
@@ -45,11 +48,12 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
             while("" in split_route):
                 split_route.remove("")
             print(split_route)
-            handler, params = self._router.get_handler(method, split_route)
+            handler, params = self.router.get_handler(method, split_route)
             
             # run handler
             req = Request(method, self.path, params, self.headers.get("Content-Type"), self._get_body())
             print("-", req.method.name.upper(), req.url)
+            print("request: ", req)
             resp = handler(req)
             
             # attach basic headers
@@ -83,15 +87,15 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
         
     def _init_routes(self):      
         """ Adds the routes to the router. """
-        self._router = router = _Router()
+        self.router = router = _Router()
         router.add_route(_Route("/api/service/{service_name}/account/{account_id}", 
-            CreateMasterPasswordHandler()
+            with_dtclient(self.database)(CreateMasterPasswordHandler())
         ).add_method(Method.POST))
         router.add_route(_Route("/api/service/{service_name}/account/{account_id}/regenerate", 
-            RegenerateMasterPasswordHandler()
+            with_dtclient(self.database)(RegenerateMasterPasswordHandler())
         ).add_method(Method.POST))
         router.add_route(_Route("/api/service/{service_name}/account/{account_id}/login", 
-            LoginHandler()
+            with_dtclient(self.database)(LoginHandler())
         ).add_method(Method.POST))
         
         print(router)
