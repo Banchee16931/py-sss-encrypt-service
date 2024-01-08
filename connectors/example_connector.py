@@ -1,4 +1,4 @@
-from typing import override
+from typing_extensions import override
 from connectors import ServiceConnector
 from db.client import DBClient
 from db.database import Database

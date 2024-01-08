@@ -1,4 +1,4 @@
-from typing import override
+from typing_extensions import override
 from api.handler import CreateMasterPasswordHandler, LoginHandler, RegenerateMasterPasswordHandler
 from utils.http import HTTPException, Method, Request, Status
 from http.server import BaseHTTPRequestHandler
