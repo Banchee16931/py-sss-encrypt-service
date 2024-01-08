@@ -28,16 +28,12 @@ def get_master_password(client: DBClient, service_name: str, account_id: str, re
     """ Gets the shares related to the login request and attempts to reconstruct them into a master password """
     shares: List[str] = []
     
-    print("getting data: ", req)
     for user_id in req.user_passwords.keys():
-        print("in loop")
         next_pass = client.get_password(service_name, account_id, user_id)
         if not Crypt.check_hash(req.user_passwords[user_id], next_pass.hashed_password):
             raise HTTPException(Status.Unauthorized, "incorrect password given")
         
         shares.append(Crypt.decrypt(req.user_passwords[user_id], next_pass.encrypted_share))     
-    
-    print("recreating master password")
     master_password = _ShamirSecretSharing.combine(shares)
     
     return master_password

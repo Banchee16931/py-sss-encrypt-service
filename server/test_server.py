@@ -20,13 +20,13 @@ def test_main_path():
     server_mock = create_valid_server(mocked_router, "path/path")
     
     # act
-    Server.do_GET(server_mock)
+    server_mock.do_GET()
     mocked_router.get_handler.assert_called_with(Method.GET, ["path", "path"])
-    Server.do_PUT(server_mock)
+    server_mock.do_PUT()
     mocked_router.get_handler.assert_called_with(Method.PUT, ["path", "path"])
-    Server.do_DELETE(server_mock)
+    server_mock.do_DELETE()
     mocked_router.get_handler.assert_called_with(Method.DELETE, ["path", "path"])
-    Server.do_POST(server_mock)
+    server_mock.do_POST()
     mocked_router.get_handler.assert_called_with(Method.POST, ["path", "path"])
     
 def test_call_failed():
@@ -46,7 +46,7 @@ def test_call_failed():
     server_mock.send_error = Mock()
     
     # act
-    Server.do_GET(server_mock)
+    server_mock.do_GET()
     
     # assert
     server_mock.send_error.assert_called_once_with(400, explain="test message")

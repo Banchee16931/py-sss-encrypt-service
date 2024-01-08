@@ -6,6 +6,7 @@ import tempfile
 import types
 from typing import Tuple
 from unittest.mock import Mock
+from connectors import Connectors
 from db.client import DBClient
 from db.database import Database
 from db.decorators import with_dtclient
@@ -39,21 +40,75 @@ def test_main_path():
     Server._init_routes(server)
     server = create_valid_server(server.router, "")
     
-    for x in range(10):
-        # test data
-        threshold, user_passwords = create_user_passwords()
-        account_id = create_user_id()
+    # test data
+    threshold, user_passwords = create_user_passwords()
+    account_id = create_user_id()
+    
+    # setting up for creating master password
+    print("creating master password")
+    req_body = {"password_threshold":threshold, "user_passwords":user_passwords}
+    server = attach_request_to_server(server, "/api/service/example/account/"+account_id, json.dumps(req_body))
+    # act
+    server.do_POST()
+    # assert
+    server.wfile.write.was_called()
+    jsonResp = json.loads(server.wfile.write.call_args.args[0])
+    resp = types.SimpleNamespace(**jsonResp)
+    assert len(resp.password) > 0
+    
+    # setting up for login
+    print("login")
+    req_body = {"user_passwords":user_passwords}
+    server = attach_request_to_server(server, "/api/service/example/account/"+account_id+"/login", 
+        json.dumps(req_body))
+    # act
+    server.do_POST()
+    # assert
+    server.send_header.was_called()
+    header = server.send_header.call_args.args[0]
+    value = server.send_header.call_args.args[1]
+    assert header == "Authorization"
+    assert "Bearer" in value
+    assert "demo-token-example"
         
-        # creating master password
-        print("creating master password")
-        req_body = {"password_threshold":threshold, "user_passwords":user_passwords}
-        server = attach_request_to_server(server, "/api/service/example/account/"+account_id, json.dumps(req_body))
-        Server.do_POST(server)
-        jsonResp = json.loads(server.wfile.write.call_args.args[0])
-        print("response: ", jsonResp)
-        resp = types.SimpleNamespace(**jsonResp)
+    # setting up for regenerating
+    threshold, new_user_passwords = create_user_passwords()
+    print("regenerating")
+    req_body = {
+        "user_passwords":user_passwords, 
+        "new": {
+            "password_threshold": threshold, 
+            "user_passwords":new_user_passwords
+        }
+    }
+    server = attach_request_to_server(server, "/api/service/example/account/"+account_id+"/regenerate", 
+        json.dumps(req_body))
+    # act
+    server.do_POST()
+    # assert
+    server.wfile.write.was_called()
+    jsonResp = json.loads(server.wfile.write.call_args.args[0])
+    resp = types.SimpleNamespace(**jsonResp)
+    assert len(resp.password) > 0
+    
+    # new test values
+    user_passwords = new_user_passwords
+    
+    # setting up for new login check
+    print("login")
+    req_body = {"user_passwords":user_passwords}
+    server = attach_request_to_server(server, "/api/service/example/account/"+account_id+"/login", 
+        json.dumps(req_body))
+    # act
+    server.do_POST()
+    # assert
+    server.send_header.was_called()
+    header = server.send_header.call_args.args[0]
+    value = server.send_header.call_args.args[1]
+    assert header == "Authorization"
+    assert "Bearer" in value
+    assert "demo-token-example"
         
-        assert len(resp.password) > 0
         
     
     

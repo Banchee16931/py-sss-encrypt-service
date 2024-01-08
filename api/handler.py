@@ -15,7 +15,7 @@ class CreateMasterPasswordHandler:
     @JSONHandler
     @transaction
     @log
-    def __call__(client: DBClient, self, req: Request) -> Response:
+    def __call__(client: DBClient, req: Request) -> Response:
         print("decoding parameters")
         service_name, account_id = get_params(req.params, "service_name", "account_id")
         try:
@@ -43,7 +43,7 @@ class LoginHandler:
     """ Handles login requests. """
     @JSONHandler
     @log
-    def __call__(client: DBClient, self, req: Request) -> Response:
+    def __call__(client: DBClient, req: Request) -> Response:
         print("decoding parameters")
         service_name, account_id = get_params(req.params, "service_name", "account_id")
         try:
@@ -74,7 +74,7 @@ class RegenerateMasterPasswordHandler:
     """ Handles regenerate master password requests. """
     @JSONHandler
     @log
-    def __call__(client: DBClient, self, req: Request) -> Response:
+    def __call__(client: DBClient, req: Request) -> Response:
         print("decoding parameters")
         service_name, account_id = get_params(req.params, "service_name", "account_id")
         try:
@@ -86,7 +86,7 @@ class RegenerateMasterPasswordHandler:
         
         regen_req.validate()
         
-        regenerate_master_password(service_name, account_id, regen_req)
+        regenerate_master_password(client, service_name, account_id, regen_req)
         
         resp = Response(Status.Created)
         

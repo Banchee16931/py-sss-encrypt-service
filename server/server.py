@@ -16,19 +16,19 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
     
     def do_GET(self):
         """ The function that is called during a GET HTTP request. """
-        self.handle_request(self, Method.GET)
+        self.handle_request(Method.GET)
         
     def do_POST(self):
         """ The function that is called during a POST HTTP request. """
-        self.handle_request(self, Method.POST)
+        self.handle_request(Method.POST)
         
     def do_PUT(self):
         """ The function that is called during a PUT HTTP request. """
-        self.handle_request(self, Method.PUT)
+        self.handle_request(Method.PUT)
         
     def do_DELETE(self):
         """ The function that is called during a DELETE HTTP request. """
-        self.handle_request(self, Method.DELETE)
+        self.handle_request(Method.DELETE)
         
     @classmethod
     def pre_start(self):
@@ -54,6 +54,7 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
             req = Request(method, self.path, params, self.headers.get("Content-Type"), self._get_body())
             print("-", req.method.name.upper(), req.url)
             print("request: ", req)
+            print("handler: ", handler)
             resp = handler(req)
             
             # attach basic headers
@@ -71,6 +72,7 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
                 self.wfile.write(resp.body)    
                         
         except HTTPException as inst:
+            raise inst
             # default handle exceptions via HTML
             self.send_error(inst.status_code(), explain = inst.message)
         except Exception as inst:

@@ -52,7 +52,7 @@ def log(func: Callable):
             if req == None:
                 raise HTTPException(Status.InternalServerError, f"handler ({func.__name__}) is mis-configured: missing req param")
             
-            print(" entered:", func.__name__)
+            print(" entered:", func.__name__, args)
             resp = func(*args, **kwargs)
             print(" exited:", func.__name__)
             return resp

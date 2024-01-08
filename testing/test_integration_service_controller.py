@@ -11,7 +11,7 @@ def test_server_handle_request():
     # test data
     test_value = "I am a test value"
     input_path = "path/other/"+test_value
-    expected_request = Request(Method.GET, input_path, {"value":test_value}, HTTPContentType.JSON, "{}")
+    expected_request = Request(Method.GET, input_path, {"value":test_value}, HTTPContentType.JSON.value, "{}")
     
     # handler setup
     handler = Mock()
@@ -29,7 +29,7 @@ def test_server_handle_request():
     server_mock.send_header = Mock()
     
     # act
-    Server.do_GET(server_mock)
+    server_mock.do_GET()
     
     # assert
     handler.assert_called_once_with(expected_request)

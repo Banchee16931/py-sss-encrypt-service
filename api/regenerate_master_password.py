@@ -42,7 +42,7 @@ def regenerate_master_password(client: DBClient, service_name: str, account_id: 
     req.validate()
     
     print("getting old password")
-    old_master_password = with_dtclient(client)(transaction(get_master_password))(service_name, account_id, LoginRequest(req.user_passwords))
+    old_master_password = (transaction(get_master_password))(client, service_name, account_id, LoginRequest(req.user_passwords))
     
     print("authenticating old password")
     Connectors().get_session_token(service_name, account_id, old_master_password)
@@ -54,7 +54,6 @@ def regenerate_master_password(client: DBClient, service_name: str, account_id: 
     print("updating old password")
     Connectors().update_account_password(service_name, account_id, old_master_password, new_master_password)
     
-    @with_dtclient(client)
     @transaction
     def replace_passwords(client: DBClient):
         client.delete_passwords(service_name, account_id)
@@ -63,4 +62,4 @@ def regenerate_master_password(client: DBClient, service_name: str, account_id: 
             client.store_password(service_name, account_id,
                 password.user_id, password.hashed_password, password.encrypted_share)
             
-    replace_passwords()
+    replace_passwords(client)

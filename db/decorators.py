@@ -10,6 +10,7 @@ def with_dtclient(db: Database) -> Callable[[Callable], Handler]:#
         def inner(*args, **kwargs) -> Any: # Used to wrap the function
             conn, client = db.client()
             try:
+                print("calling with", args)
                 result = func(client, *args, **kwargs)
             except Exception as inst:
                 client._cur.close()
