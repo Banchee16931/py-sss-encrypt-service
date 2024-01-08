@@ -20,6 +20,7 @@ jobs:
           pip install pycryptodome
           pip install bcrypt
           pip install typing-extensions
+          pip install typing
           pip install pytest
           pip install pytest-xdist
       - name: Run tests
