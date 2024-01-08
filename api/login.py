@@ -35,5 +35,6 @@ def get_master_password(client: DBClient, service_name: str, account_id: str, re
         
         shares.append(Crypt.decrypt(req.user_passwords[user_id], next_pass.encrypted_share))     
     master_password = _ShamirSecretSharing.combine(shares)
+    print("output master pass: ", master_password)
     
     return master_password

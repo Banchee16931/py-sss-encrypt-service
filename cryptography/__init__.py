@@ -14,7 +14,7 @@ class Crypt:
     """ Contains all functions relating to cryptography for this system. """
     
     def generate_password() -> str:
-        __PASSWORD_LEN = 128
+        __PASSWORD_LEN = 30
         alphabet = string.ascii_letters + string.digits
         return ''.join(secrets.choice(alphabet) for i in range(__PASSWORD_LEN))
     
@@ -55,10 +55,10 @@ class Crypt:
         """ Checks if a bycrpt hash is the hash of a given password. """
         return bcrypt.checkpw(password.encode("latin-1"), hash.encode("latin-1"))
     
-    def split(self, minimum: int, share_count: int, password: str) -> list[str]:
+    def split(minimum: int, share_count: int, password: str) -> list[str]:
         """ Uses SSS to split a password into shares. """
-        _ShamirSecretSharing.create(minimum, share_count, password)
+        return _ShamirSecretSharing.create(minimum, share_count, password)
         
-    def combine(self, shares: list[str]) -> str:
+    def combine(shares: list[str]) -> str:
         """ Uses SSS to combine a set of shared back into a password. """
-        _ShamirSecretSharing.combine(shares)
+        return _ShamirSecretSharing.combine(shares)

@@ -1,3 +1,4 @@
+from cryptography import Crypt
 from server.server import Server
 from server.threaded_server import ThreadedHTTPServer
 
@@ -6,7 +7,6 @@ serverPort = 8080
 
 def main():
     """ The start point of the system. """
-    
     # Creating Server
     threadedServer = ThreadedHTTPServer(('localhost', 8080), Server)
     print("Server started http://%s:%s" % (hostName, serverPort))

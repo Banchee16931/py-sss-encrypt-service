@@ -29,6 +29,7 @@ class CreateMasterPasswordHandler:
         
         master_password, passwords = create_master_password(creation_req)
         
+        print("input master password", master_password)
         print("storing passwords")
         for password in passwords:
             client.store_password(service_name, account_id,password.user_id, password.hashed_password, 

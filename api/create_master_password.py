@@ -50,6 +50,7 @@ def create_master_password(req: CreateMasterPasswordRequest) -> tuple[str, List[
         user_pass = req.user_passwords[user_id]
         
         hashed_password = Crypt.hash(user_pass)
+        print("input share:", user_id, shares[i])
         encrypted_share = Crypt.encrypt(user_pass, shares[i])
         
         passwords.append(UserPassword(user_id, hashed_password, encrypted_share))  
