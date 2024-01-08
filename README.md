@@ -16,8 +16,22 @@ py -m ensurepip --upgrade
 py -m pip install pycryptodome
 py -m pip install bcrypt
 ```
+### Setting up testing
+To setup your PC for automatic testing:
+```
+py -m pip install pytest
+py -m pip install pytest-xdist
+```
 
-To test the system run the following commands:
+### Running the tests
+Running just unit tests
+```
+py -m pytest -v --ignore testing
+```
+Running all tests
+```
+py -m pytest -v```
+
 ### Starting the server
 ```
 py main.py

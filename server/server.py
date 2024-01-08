@@ -13,19 +13,19 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
     
     def do_GET(self):
         """ The function that is called during a GET HTTP request. """
-        self.handle_request(Method.GET)
+        self.handle_request(self, Method.GET)
         
     def do_POST(self):
         """ The function that is called during a POST HTTP request. """
-        self.handle_request(Method.POST)
+        self.handle_request(self, Method.POST)
         
     def do_PUT(self):
         """ The function that is called during a PUT HTTP request. """
-        self.handle_request(Method.PUT)
+        self.handle_request(self, Method.PUT)
         
     def do_DELETE(self):
         """ The function that is called during a DELETE HTTP request. """
-        self.handle_request(Method.DELETE)
+        self.handle_request(self, Method.DELETE)
         
     @classmethod
     def pre_start(self):
@@ -44,6 +44,7 @@ class Server(ThreadingMixIn, BaseHTTPRequestHandler, HTTPServer):
             split_route = self.path.split("/")
             while("" in split_route):
                 split_route.remove("")
+            print(split_route)
             handler, params = self._router.get_handler(method, split_route)
             
             # run handler

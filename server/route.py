@@ -2,7 +2,6 @@ from typing import Self
 from utils.http import Handler, Method
 
 class _Route():
-    
     path: str
     split_path: list[str]
     params: dict[int, str]

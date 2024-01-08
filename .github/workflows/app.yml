@@ -1,0 +1,24 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install tox and any other packages
+        run: |
+          pip install pycryptodome
+          pip install bcrypt
+          pip install pytest
+          pip install pytest-xdist
+          pytest -n 5 -v --show-capture=all

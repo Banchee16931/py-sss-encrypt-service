@@ -51,6 +51,14 @@ class Request:
         self.content_type = content_type
         self.body = body
         
+    def __eq__(self, other) -> bool:
+        if type(self) != type(other):
+            return NotImplemented
+        return vars(self) == vars(other)
+        
+    def __repr__(self) -> str:
+        return "url: "+self.url+", params: "+str(self.params)+", body: "+str(self.body)+", content_type: "+str(self.content_type)+", method: "+str(self.method)
+        
 class Response:
     """ Contains all the data that is used to format the response body. """
     status: Status
