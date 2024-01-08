@@ -50,3 +50,5 @@ def test_call_failed():
     
     # assert
     server_mock.send_error.assert_called_once_with(400, explain="test message")
+    
+    assert False
