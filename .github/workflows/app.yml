@@ -21,7 +21,6 @@ jobs:
           pip install bcrypt
           pip install pytest
           pip install pytest-xdist
-          pytest -n 5 -v --show-capture=all
       - name: Run tests
         run: |
           pytest -n 5 -v --show-capture=all
